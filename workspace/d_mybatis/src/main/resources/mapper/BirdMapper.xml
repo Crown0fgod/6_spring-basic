@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.d_mybatis.mapper.BirdMapper">
+
+    <select id="getTime" resultType="string">
+        SELECT SYSDATE FROM DUAL
+    </select>
+
+    <!--    세미콜론이 있으면 에러!-->
+    <!--    parameterType 은 매개변수의 타입을 작성, 생략 가능!-->
+    <!--    sql이 실행될 때마다 바뀌어야하는 값이 있다면, 인터페이스에서 매개변수로 전달 받고-->
+    <!--    #{} 안에 변수 이름을 작성해준다.(변수의 이름은 맞춰줘야 한다)-->
+    <select id="selectById" resultType="com.example.d_mybatis.domain.BirdVO" parameterType="_int">
+        select * from   TBL_BIRD
+        where ID = #{id}
+    </select>
+
+    <select id="selectAll" resultType="BirdVO">
+        select * from TBL_BIRD
+    </select>
+
+    <!--    insert-->
+    <insert id="insert" parameterType="BirdVO">
+        INSERT INTO TBL_BIRD(ID, NAME, AGE, GENDER)
+        VALUES (SEQ_BIRD.NEXTVAL, #{name}, #{age}, #{gender})
+    </insert>
+
+    <!--    update-->
+<!--    update를 구현하는 한가지 방법에 대해서 설명-->
+<!--    우리는 이 쿼리문을 꼭 사용하면서 업데이트를 구현할 것이다.-->
+<!--    1. 내 정보 수정페이지에서 form 태그로 모든 정보를 받아온다.-->
+<!--    여기서 넘어온 데이터들은 수정 된 것도 있고, 안된 것도 있고, null 은 없음
+        이 상태에서, 웹에서 넘어온 객체를 매핑하고, 그 객체를 매개변수로 삼아서
+        해당 쿼리문을 실행하면! 수정된 데이터들만 바뀐 것 처럼 보인다.-->
+
+<!--    2. 수정 페이지에서 수정된 데이터와 pk만 받아 넘어온다.
+        이 상태에서 수정된 데이터만 보면, 어디에 있는 무언가를 바꿔라 라는 것을 알 수 없다.
+         같이 넘어온 pk가 있기에, 해당 pk의 어떤 컬럼을 방금 넘어온 데이터로 수정해라 라는 것을 알 수 있다.
+         여기서 만약에 내가 VO로 객체를 만들고, setter 로 방금 수정된 데이터를 넣어주고
+         해당 쿼리문을 실행한다면 수정이 되지 않은 데이터들에는 null 이나 초기값이 들어가있다.
+         안되니까, pk 를 이용하여 해당 객체의 전체 데이터를 자바로 읽어온다.
+         여기에서 읽어온 객체의 수정하고 싶은 부분만 setter 로 수정한다.
+         그 다음, 해당 쿼리문을 실행한다.-->
+    <update id="updateById">
+        update tbl_bird
+        set name = #{name}, age = #{age}, gender = #{gender}
+        where id = #{id}
+    </update>
+
+<!--    delete 쿼리문-->
+    <delete id="deleteById">
+        delete from tbl_bird
+        where id = #{id}
+    </delete>
+</mapper>
